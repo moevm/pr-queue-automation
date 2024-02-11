@@ -9,7 +9,7 @@ class ParseDataGit():
 		self.user = self.g.get_user().login # логин юзера
 		self.repo = self.g.get_repo(f"{self.user}/{repo_name}") # класс с информацией о репо
 		self.pulls = self.repo.get_pulls(state='open', sort='created') # список со всеми пул рек в репо
-		self.path_temp_name = None # путь до шаблона с именами
+		self.path_temp_name = None # путь до шаблона с cообщением
 		self.path_table_discord_names = None # путь до таблицы с дискорд именами
 
 	def get_title_label_dict(self, tp_work=None):
@@ -24,6 +24,22 @@ class ParseDataGit():
 		self.g.close()
 		return user_label_dict
 	
+	def get_status_to_proctering(self, tp_work=None):
+		students = self.get_title_label_dict(tp_work=tp_work) # словарь ключь - title занчния - список лейблов
+		status_of_students = {}
+		for student in students:
+			if 'deline-' in students[student] or '-1' in students[student]:
+				status_of_students[student] = 'not passed'
+			elif 'passed' not in students[student]:
+				status_of_students[student] = 'not passed'
+			elif len({'0', '1', '2', '3'} & set(students[student])) != 0:
+				status_of_students[student] = 'passed'
+			else:
+				status_of_students[student] = 'not passed'	
+		return status_of_students
+				
+
+	
 	def set_path_to_temp_names(self, path):
 		self.path_temp_name = path
 	
@@ -32,7 +48,25 @@ class ParseDataGit():
 
 
 if __name__ == "__main__":
-	git_data = ParseDataGit(token='', repo_name='test_repo')
+	git_data = ParseDataGit(token='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', repo_name='test_repo')
 	print(git_data.get_title_label_dict())
+	print(git_data.get_status_to_proctering())
 	# тестовый репозиторий https://github.com/abonent-21/test_repo
-	# результат: {'Add some code': ['bug', 'enhancement', 'help wanted']}
+	# результат
+	# {'Ivan_Ivanov_lb3': ['passed', '-1', 'moodle+', 'new_changes', 'report failed'],
+	# 'Kopya_Toster_lb2': ['passed',
+	# 					'dedline-',
+	# 					'moodle+',
+	# 					'new_changes',
+	# 					'report failed'],
+	# 'Mark_Markovich_cw': ['3',
+	# 					'passed',
+	# 					'moodle+',
+	# 					'new_changes',
+	# 					'report failed'],
+	# 'Slava_Ivanov_lb1': ['0', 'passed', 'moodle+', 'new_changes', 'report ok']}
+	# {'Ivan_Ivanov_lb3': 'not passed',
+	# 'Kopya_Toster_lb2': 'not passed',
+	# 'Mark_Markovich_cw': 'passed',
+	# 'Slava_Ivanov_lb1': 'passed'}
+	
