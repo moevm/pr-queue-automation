@@ -9,7 +9,7 @@ class ParseDataGit():
 		self.user = self.g.get_user().login # логин юзера
 		self.repo = self.g.get_repo(f"{self.user}/{repo_name}") # класс с информацией о репо
 		self.pulls = self.repo.get_pulls(state='open', sort='created') # список со всеми пул рек в репо
-		self.path_temp_name = None # путь до шаблона с cообщением
+		self.path_temp_message = None # путь до шаблона с cообщением
 		self.path_table_discord_names = None # путь до таблицы с дискорд именами
 
 	def get_title_label_dict(self, tp_work=None):
@@ -40,15 +40,21 @@ class ParseDataGit():
 				
 
 	
-	def set_path_to_temp_names(self, path):
-		self.path_temp_name = path
+	def set_path_to_temp_message(self, path):
+		self.path_temp_message = path
 	
-	def set_path_to_temp_names(self, path):
+	def get_path_to_temp_message(self):
+		return self.path_temp_message
+
+	def set_path_to_table_discord_names(self, path):
 		self.path_table_discord_names = path
+	
+	def get_path_to_table_discord_names(self, path):
+		return self.path_table_discord_names
 
 
 if __name__ == "__main__":
-	git_data = ParseDataGit(token='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', repo_name='test_repo')
+	git_data = ParseDataGit(token='', repo_name='test_repo')
 	print(git_data.get_title_label_dict())
 	print(git_data.get_status_to_proctering())
 	# тестовый репозиторий https://github.com/abonent-21/test_repo
