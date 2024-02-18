@@ -71,10 +71,11 @@ class DataHandlerGit(ParseDataGit):
     def get_data_from_google_sheet():
         pass
 
-a = DataHandlerGit(token1='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',name_repo='test_repo')
-a.set_path_to_res_temp_message('templates/result_templates/result_template.txt')
-a.set_path_to_temp_message('templates/script_templates/temp_for_lb.txt')
-a.generate_temp_messasge(type_work='lb')
+if __name__ == '__main__':
+    a = DataHandlerGit(token1='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',name_repo='test_repo')
+    a.set_path_to_res_temp_message('templates/result_templates/result_template.txt')
+    a.set_path_to_temp_message('templates/script_templates/temp_for_lb.txt')
+    a.generate_temp_messasge(type_work='lb')
         
 
         
