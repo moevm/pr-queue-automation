@@ -1,5 +1,6 @@
 from scrtip_parsing_pr import ParseDataGit
 from jinja2 import Environment, FileSystemLoader
+from google_sheet_data_handeler import get_name_discord_acc_dict
 
 
 
@@ -19,17 +20,21 @@ class DataHandlerGit(ParseDataGit):
             print("Set path to result and script message")
             raise Exception
         name_status_list_of_dict = []
-        students = self.get_status_to_proctering() # cловарь с именами и статусами допуска
+        students_status = self.get_status_to_proctering() # cловарь с именами и статусами допуска
+        discord_login = get_name_discord_acc_dict(sheet_key='1WEX-4FBdcUHsJpf7ybKZP52R3X4SfEqdJ8xM-1Tbxt8',
+                          name_list='Workdata',
+                          range_data='A2:B')
 
-        for student in students:
+
+        for student in students_status:
             buffer_dict = {}
             name = ' '.join(student.split('_')[:-1])
-            status = students[student]
+            status = students_status[student]
             t_work = student.split('_')[-1]
             if status == 'passed' and type_work in t_work:
                 buffer_dict['name'] = name
                 buffer_dict['status'] = status
-                # buffer_dict['discord_login'] = ''
+                buffer_dict['discord_login'] = discord_login[name]
                 name_status_list_of_dict.append(buffer_dict)
 
         environment = Environment(loader=FileSystemLoader(path_temp_message)) # среда для шаблона jinja 

@@ -7,7 +7,7 @@
 
 
 {% for student in students %}
-    {{ student.name }}:  {{ student.status }}
+    @{{student.discord_login}}:  {{ student.status }} Вариант - 
 {% endfor %}
 
 

@@ -39,7 +39,7 @@ class ParseDataGit():
 
 if __name__ == "__main__":
 	#пример кода
-	git_data = ParseDataGit(token='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', repo_name='test_repo')
+	git_data = ParseDataGit(token='', repo_name='test_repo')
 	print(git_data.get_title_label_dict())
 	print(git_data.get_status_to_proctering())
 	# тестовый репозиторий https://github.com/abonent-21/test_repo
