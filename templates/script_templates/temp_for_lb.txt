@@ -6,9 +6,11 @@
 Ссылка на курс для защиты лабораторных работ - https://e.moevm.info/course/view.php?id=24, ключ поступления - 2UixfW.
 
 
-{% for student in students %}
-    @{{student.discord_login}}:  {{ student.status }} Вариант - 
-{% endfor %}
+
+    @ivanq234:  passed
+
+    @toster321:  passed
+
 
 
 Лабораторная работа №3, Вариант 3  -- https://e.moevm.info/mod/quiz/view.php?id=1068
