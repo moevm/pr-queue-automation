@@ -10,9 +10,9 @@ httpAuth = credentials.authorize(httplib2.Http()) # Авторизуемся в 
 service = build('sheets', 'v4', http = httpAuth) # Выбираем работу с таблицами и 4 версию API 
 
 
-def get_name_discord_acc_dict(sheet_key, name_list, range_data='A2:B'):
+def get_name_discord_acc_dict(sheet_key, name_sheet, range_data='A2:B'):
     name_login_dicord = {}
-    ranges = [f"{name_list}!{range_data}"]       
+    ranges = [f"{name_sheet}!{range_data}"]       
     results = service.spreadsheets().values().batchGet(spreadsheetId = sheet_key, 
                                         ranges = ranges, #  задаем промежуток считывания
                                         valueRenderOption = 'FORMATTED_VALUE',  
@@ -22,31 +22,35 @@ def get_name_discord_acc_dict(sheet_key, name_list, range_data='A2:B'):
         name_login_dicord[i[0]] = i[1]
     return name_login_dicord
 
-def get_name_status_work_dict(sheet_key, name_list, range_data="A2:Z"):
+def get_name_status_work_dict_sheet(sheet_key, name_sheet, range_data="A2:Z"):
     status_work = {}
-    ranges = [f"{name_list}!{range_data}"]       
+    ranges = [f"{name_sheet}!{range_data}"]       
     results = service.spreadsheets().values().batchGet(spreadsheetId = sheet_key, 
                                         ranges = ranges, #  задаем промежуток считывания
                                         valueRenderOption = 'FORMATTED_VALUE',  
                                         dateTimeRenderOption = 'FORMATTED_STRING').execute() 
     sheet_values = results['valueRanges'][0]['values']
+    # добаляю ячейки для курсовой, если их нет
+    for stud in sheet_values:
+        if stud[-1] != 'допущен':
+            stud.append('')
     for data_student in sheet_values:
         status_work[data_student[0]] = {}
         num_work = 1
-        for status in data_student[3::2]:
-            if status.lower() != 'допущен':
-                status_work[data_student[0]][f'lb_{num_work}'] = ''
+        for status in data_student[3::2][:-1]: # 1: ['Kopya Toster', 'toster321', '2', '', '4', 'допущен', '4', '', '3', '', '2', '' - > статус курсовой] , беру только ячейки со статусом за исключением последней для курсовой 
+            if status.lower() not in ['допущен', 'защитил']:
+                status_work[data_student[0]][f'lb{num_work}'] = '' # зануляю ячейку, если в ней оказался мусор
             else:
-                status_work[data_student[0]][f'lb_{num_work}'] = 'допущен'
+                status_work[data_student[0]][f'lb{num_work}'] = status.lower()
             num_work += 1
-        if data_student[-1].lower() != 'допущен':
+        if data_student[-1].lower() not in ['допущен', 'защитил']:
             status_work[data_student[0]]['cw'] = ''
         else:
-            status_work[data_student[0]]['cw'] = 'допущен'
+            status_work[data_student[0]]['cw'] = data_student[-1].lower()
     return status_work
 
 
-def change_data_in_goodle_sheet(sheet_key, name_list, cell, data_in_cell:str, gid, color:dict):
+def change_data_in_goodle_sheet(sheet_key, name_sheet, cell, data_in_cell:str, gid, color:dict):
     # Установка формата ячеек
     letter, number = cell[0], cell[1]
     column, row = ord(letter) % 65, int(number) - 1
@@ -63,7 +67,9 @@ def change_data_in_goodle_sheet(sheet_key, name_list, cell, data_in_cell:str, gi
             {
             "userEnteredFormat": 
                 {
-                "backgroundColor": color
+                "backgroundColor": {'green': color['green']/255,
+                                    'blue': color['blue']/255,
+                                    'red': color['red']/255}
                 }
             },
             "range": 
@@ -82,7 +88,7 @@ def change_data_in_goodle_sheet(sheet_key, name_list, cell, data_in_cell:str, gi
     service.spreadsheets().values().batchUpdate(spreadsheetId = sheet_key, body = {
     "valueInputOption": "USER_ENTERED", # Данные воспринимаются, как вводимые пользователем (считается значение формул)
     "data": [
-        {"range": f"{name_list}!{cell}",
+        {"range": f"{name_sheet}!{cell}",
          "majorDimension": "ROWS",     # Сначала заполнять строки, затем столбцы
          "values": [
                     [f"{data_in_cell}"] # Заполняем вторую строку

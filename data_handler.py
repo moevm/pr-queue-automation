@@ -1,16 +1,12 @@
 from scrtip_parsing_pr import ParseDataGit
 from jinja2 import Environment, FileSystemLoader
-from google_sheet_data_handeler import get_name_discord_acc_dict, get_name_status_work_dict, change_data_in_goodle_sheet
-
+from google_sheet_data_handeler import get_name_discord_acc_dict, get_name_status_work_dict_sheet, change_data_in_goodle_sheet
 
 
 class DataHandlerGit(ParseDataGit):
     def __init__(self,token1, name_repo, sheet_google_token):
         super().__init__(token=token1, repo_name=name_repo)
         self.sheet_google_token = sheet_google_token
-        # 1WEX-4FBdcUHsJpf7ybKZP52R3X4SfEqdJ8xM-1Tbxt8
-        # Workdata
-        # A2:B
 
     def generate_temp_messasge(self, type_work: str, script_path: str, result_path: str, name_google_list: str, range_data: str):
         path_to_result_temp_message = script_path # путь до шаблона после собработки скриптом
@@ -53,13 +49,39 @@ class DataHandlerGit(ParseDataGit):
             print(f"Data has been written to {results_filename}")
 
         
-    def update_status_to_proctoring(self, name_list_sheet):
-        status_to_proctering_from_git = self.get_status_to_proctering()
-        status_to_procteting_from_gs = get_name_status_work_dict(sheet_key=self.sheet_google_token, name_list=name_list_sheet)
+    def update_status_to_proctoring(self, name_sheet_1):
+        status_to_proctering_from_git = super().get_status_to_proctering()
+        status_to_procteting_from_gs = get_name_status_work_dict_sheet(sheet_key=self.sheet_google_token, name_sheet=name_sheet_1)
+        for stud in status_to_proctering_from_git:
+            name, surname, type_work = stud.split('_')
+            status = status_to_proctering_from_git[stud]
+            if status == 'passed':
+                status_to_procteting_from_gs[f'{name} {surname}'][type_work] = 'допущен'
+            else:
+                status_to_procteting_from_gs[f'{name} {surname}'][type_work] = ''
+        # заполнение листа новыйми данными (заполнение происходит через 1 ячейку)
+        start_cell = ['D', 2]
+        for stud in status_to_procteting_from_gs:
+            gs = status_to_procteting_from_gs
+            for work in status_to_procteting_from_gs[stud]:
+                status = gs[stud][work]
+                cell = f'{start_cell[0]}{start_cell[1]}'
+                color_status = {'green':202, 'blue':202, 'red':202}
+                if status == 'допущен':
+                    color_status = {'green':204, 'blue':0, 'red':0}
+                change_data_in_goodle_sheet(sheet_key='1WEX-4FBdcUHsJpf7ybKZP52R3X4SfEqdJ8xM-1Tbxt8', 
+                                 name_sheet='Workdata', cell=cell, data_in_cell=status, 
+                                 gid=0, color=color_status)
+                start_cell[0] = chr(ord(start_cell[0]) + 2) # перепригиваю через букву чтобы перени на новую ячейку
+            start_cell[0] = 'D'
+            start_cell[1] += 1
+
+        print(status_to_proctering_from_git)
+        print(status_to_procteting_from_gs)
 
 
 if __name__ == '__main__':
-    a = DataHandlerGit(token1='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',name_repo='test_repo', 
+    a = DataHandlerGit(token1='',name_repo='test_repo', 
                        sheet_google_token='1WEX-4FBdcUHsJpf7ybKZP52R3X4SfEqdJ8xM-1Tbxt8')
     name_list = 'Workdata'
     r_data = 'A2:B'
@@ -68,9 +90,10 @@ if __name__ == '__main__':
     # a.generate_temp_messasge(type_work='lb', script_path=script_text, result_path=res_text,
     #                          name_google_list=name_list, range_data=r_data)
     # print(a.update_status_to_proctoring(name_list_sheet="Workdata"))
-    change_data_in_goodle_sheet(sheet_key='1WEX-4FBdcUHsJpf7ybKZP52R3X4SfEqdJ8xM-1Tbxt8', 
-                                name_list='Workdata', cell='D2', data_in_cell='hello 123', 
-                                gid=0, color={'green':1, 'blue':1, 'red':1})
+    # change_data_in_goodle_sheet(sheet_key='1WEX-4FBdcUHsJpf7ybKZP52R3X4SfEqdJ8xM-1Tbxt8', 
+    #                             name_sheet='Workdata', cell='D3', data_in_cell='passed', 
+    #                             gid=0, color={'green':204, 'blue':0, 'red':0})
+    a.update_status_to_proctoring(name_sheet_1='Workdata')
         
 
         

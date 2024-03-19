@@ -1,5 +1,6 @@
 from github import Github
 from github import Auth
+from time import sleep
 
 
 class ParseDataGit():
@@ -9,6 +10,7 @@ class ParseDataGit():
 		self.user = self.g.get_user().login # логин юзера
 		self.repo = self.g.get_repo(f"{self.user}/{repo_name}") # класс с информацией о репо
 		self.pulls = self.repo.get_pulls(state='open', sort='created') # список со всеми пул рек в репо
+		sleep(3)
 
 	def get_title_label_dict(self, tp_work=None):
 		user_label_dict = {}
