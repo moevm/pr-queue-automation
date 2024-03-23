@@ -1,8 +1,14 @@
 import httplib2 
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials	
+import argparse
 
-CREDENTIALS_FILE = 'userdata-414709-782968eb2a5b.json'  # Имя файла с закрытым ключом, вы должны подставить свое
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-n", "--nfile", type=str, help="Название json файла c ключом для goole api (или путь до него)")
+args = parser.parse_args()
+
+CREDENTIALS_FILE = args.nfile  # Имя файла с закрытым ключом, вы должны подставить свое
 
 # Читаем ключи из файла
 credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])

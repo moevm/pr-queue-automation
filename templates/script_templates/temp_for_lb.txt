@@ -7,9 +7,9 @@
 
 
 
-    @ivanq234:  passed
-
-    @toster321:  passed
+    {% for student in students %}
+        {% if student.discord_login != 0 %}@{{student.discord_login}}: работа - {{student.type_work}} вариант -{% else %}{{student.name}}: работа - {{student.type_work}} вариант -{% endif %}
+    {% endfor %}
 
 
 

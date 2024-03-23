@@ -1,8 +1,12 @@
 import httplib2 
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials	
+from time import sleep
 
-CREDENTIALS_FILE = 'userdata-414709-782968eb2a5b.json'  # Имя файла с закрытым ключом, вы должны подставить свое
+
+
+
+CREDENTIALS_FILE = 'userdata-414709-782968eb2a5b.json' # Имя файла с закрытым ключом, вы должны подставить свое
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])
 
@@ -11,6 +15,7 @@ service = build('sheets', 'v4', http = httpAuth) # Выбираем работу
 
 
 def get_name_discord_acc_dict(sheet_key, name_sheet, range_data='A2:B'):
+    sleep(2)
     name_login_dicord = {}
     ranges = [f"{name_sheet}!{range_data}"]       
     results = service.spreadsheets().values().batchGet(spreadsheetId = sheet_key, 
@@ -23,6 +28,7 @@ def get_name_discord_acc_dict(sheet_key, name_sheet, range_data='A2:B'):
     return name_login_dicord
 
 def get_name_status_work_dict_sheet(sheet_key, name_sheet, range_data="A2:Z"):
+    sleep(2)
     status_work = {}
     ranges = [f"{name_sheet}!{range_data}"]       
     results = service.spreadsheets().values().batchGet(spreadsheetId = sheet_key, 
@@ -38,7 +44,7 @@ def get_name_status_work_dict_sheet(sheet_key, name_sheet, range_data="A2:Z"):
         status_work[data_student[0]] = {}
         num_work = 1
         for status in data_student[3::2][:-1]: # 1: ['Kopya Toster', 'toster321', '2', '', '4', 'допущен', '4', '', '3', '', '2', '' - > статус курсовой] , беру только ячейки со статусом за исключением последней для курсовой 
-            if status.lower() not in ['допущен', 'защитил']:
+            if status.lower() not in ['допущен', 'защитил', 'дедлайн']:
                 status_work[data_student[0]][f'lb{num_work}'] = '' # зануляю ячейку, если в ней оказался мусор
             else:
                 status_work[data_student[0]][f'lb{num_work}'] = status.lower()
@@ -51,9 +57,10 @@ def get_name_status_work_dict_sheet(sheet_key, name_sheet, range_data="A2:Z"):
 
 
 def change_data_in_goodle_sheet(sheet_key, name_sheet, cell, data_in_cell:str, gid, color:dict):
+    sleep(2)
     # Установка формата ячеек
     letter, number = cell[0], cell[1]
-    column, row = ord(letter) % 65, int(number) - 1
+    column, row = ord(letter) % 65, int(number) - 1 # номер столбца и строчки
     service.spreadsheets().batchUpdate(
         spreadsheetId = sheet_key,
         body = 
