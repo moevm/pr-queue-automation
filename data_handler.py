@@ -45,7 +45,6 @@ class DataHandlerGit(ParseDataGit):
             condition3 = type_work in t_work
             if status == 'passed' and (condition1 or condition3 or condition2):
                 buffer_dict['name'] = name_surname
-                buffer_dict['status'] = status
                 buffer_dict['type_work'] = t_work
                 buffer_dict['discord_login'] = 0
                 if self.sheet_google_token is not None:
@@ -71,15 +70,19 @@ class DataHandlerGit(ParseDataGit):
         status_to_procteting_from_gs = get_name_status_work_dict_sheet(sheet_key=self.sheet_google_token, name_sheet=name_sheet)
         for stud in status_to_proctering_from_git:
             name, surname, type_work = stud.split('_')
-            status = status_to_proctering_from_git[stud]
-            if status == 'passed':
-                status_to_procteting_from_gs[f'{name} {surname}'][type_work] = 'допущен'
-            elif status == 'deadline':
-                status_to_procteting_from_gs[f'{name} {surname}'][type_work] = 'дедлайн'
-            elif status == 'protected':
-                status_to_procteting_from_gs[f'{name} {surname}'][type_work] = 'защитил'
-            else:
-                status_to_procteting_from_gs[f'{name} {surname}'][type_work] = ''
+            name = name.strip()
+            try:
+                status = status_to_proctering_from_git[stud]
+                if status == 'passed':
+                    status_to_procteting_from_gs[f'{name} {surname}'][type_work] = 'допущен'
+                elif status == 'deadline':
+                    status_to_procteting_from_gs[f'{name} {surname}'][type_work] = 'дедлайн'
+                elif status == 'protected':
+                    status_to_procteting_from_gs[f'{name} {surname}'][type_work] = 'защитил'
+                else:
+                    status_to_procteting_from_gs[f'{name} {surname}'][type_work] = ''
+            except KeyError:
+                print(f'{name} {surname} некорректно записан в гугл таблице или в гихаб репозитории')
         # заполнение листа новыйми данными (заполнение происходит через 1 ячейку)
         start_cell = ['D', 2]
         for stud in status_to_procteting_from_gs:
@@ -99,22 +102,6 @@ class DataHandlerGit(ParseDataGit):
             start_cell[0] = 'D'
             start_cell[1] += 1
 
-
-
-if __name__ == '__main__':
-    a = DataHandlerGit(token1='',name_repo='test_repo', 
-                       sheet_google_token='1WEX-4FBdcUHsJpf7ybKZP52R3X4SfEqdJ8xM-1Tbxt8')
-    name_list = 'Workdata'
-    r_data = 'A2:B'
-    script_text = 'templates/script_templates/temp_for_lb.txt'
-    res_text = 'templates/result_templates/result_template.txt'
-    # a.generate_temp_messasge(type_work='lb', script_path=script_text, result_path=res_text,
-    #                          name_google_list=name_list, range_data=r_data)
-    # print(a.update_status_to_proctoring(name_list_sheet="Workdata"))
-    # change_data_in_goodle_sheet(sheet_key='1WEX-4FBdcUHsJpf7ybKZP52R3X4SfEqdJ8xM-1Tbxt8', 
-    #                             name_sheet='Workdata', cell='D3', data_in_cell='passed', 
-    #                             gid=0, color={'green':204, 'blue':0, 'red':0})
-    a.update_status_to_proctoring(name_sheet_1='Workdata')
         
 
         

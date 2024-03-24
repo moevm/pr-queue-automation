@@ -3,10 +3,11 @@ from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials	
 from time import sleep
 
+NAMEFILE = ''
+with open('GOOGLE_KEY.txt', mode="r", encoding="utf-8") as results: 
+         NAMEFILE = results.readline()  
 
-
-
-CREDENTIALS_FILE = 'userdata-414709-782968eb2a5b.json' # Имя файла с закрытым ключом, вы должны подставить свое
+CREDENTIALS_FILE = NAMEFILE # Имя файла с закрытым ключом, вы должны подставить свое
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])
 
@@ -14,7 +15,8 @@ httpAuth = credentials.authorize(httplib2.Http()) # Авторизуемся в 
 service = build('sheets', 'v4', http = httpAuth) # Выбираем работу с таблицами и 4 версию API 
 
 
-def get_name_discord_acc_dict(sheet_key, name_sheet, range_data='A2:B'):
+def get_name_discord_acc_dict(sheet_key, name_sheet, range_data='A2:B') -> dict:
+    """Резльтат - словарь, где ключ имя_фамилия_работа, а значение логин дискорд"""
     sleep(2)
     name_login_dicord = {}
     ranges = [f"{name_sheet}!{range_data}"]       
@@ -38,7 +40,7 @@ def get_name_status_work_dict_sheet(sheet_key, name_sheet, range_data="A2:Z"):
     sheet_values = results['valueRanges'][0]['values']
     # добаляю ячейки для курсовой, если их нет
     for stud in sheet_values:
-        if stud[-1] != 'допущен':
+        if stud[-1] not in ['допущен', 'защитил', 'дедлайн']:
             stud.append('')
     for data_student in sheet_values:
         status_work[data_student[0]] = {}
@@ -49,7 +51,7 @@ def get_name_status_work_dict_sheet(sheet_key, name_sheet, range_data="A2:Z"):
             else:
                 status_work[data_student[0]][f'lb{num_work}'] = status.lower()
             num_work += 1
-        if data_student[-1].lower() not in ['допущен', 'защитил']:
+        if data_student[-1].lower() not in ['допущен', 'защитил', 'дедлайн']:
             status_work[data_student[0]]['cw'] = ''
         else:
             status_work[data_student[0]]['cw'] = data_student[-1].lower()
