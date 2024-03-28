@@ -24,7 +24,7 @@ __Необязательные параметры__:<br>
 Шаблон работает по правилам стандартного шаблонизатора [Jinja2](https://proglib.io/p/rukovodstvo-dlya-nachinayushchih-po-shablonam-jinja-v-flask-2022-09-05). В шаблон передается список со словарями такой формы:
 ```py
 students = [
-{'name': 'Name Surname', 
+            {'name': 'Name Surname', 
             'type_work': 'lb1', 
             'discord_login': (0  или 'дискорд логин')}, 
             # 0 если не передали таблицу с дискорд именами
