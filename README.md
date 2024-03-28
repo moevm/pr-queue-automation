@@ -29,7 +29,7 @@ students = [
             'discord_login': (0  или 'дискорд логин')}, 
             # 0 если не передали таблицу с дискорд именами
             ...
-			]
+	    ]
 ```
 Далее при помощи цикла ```{% for student in students %}``` можно получить заначения <br> ```student.discord_login```, ```student.type_work``` и т.д.<br>
 *<u>Пример</u>*:<br>
